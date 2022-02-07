@@ -1,7 +1,5 @@
 ﻿using Lesson1Project1.Models.Dto;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lesson1Project1.MyHttpClient
@@ -13,6 +11,6 @@ namespace Lesson1Project1.MyHttpClient
         /// </summary>
         /// <param name="id">id post</param>
         /// <returns>return PostDto</returns>
-        public Task<PostDto> GetPost(int id);
+        public Task<PostDto> GetPost(int id, CancellationToken cancellationToken);
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lesson1Project1
@@ -15,9 +16,11 @@ namespace Lesson1Project1
         {
             
             using StreamWriter writer = new StreamWriter(new FileStream("result.txt", FileMode.Create, FileAccess.Write));
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(8));
             
             IEnumerable<PostDto> postsDto = await Task.WhenAll(Enumerable.Range(4, 10)
-                        .Select(async i => await HttpClientJsonPlaceHolder.GetPost(i)));
+                        .Select(async i => await HttpClientJsonPlaceHolder.GetPost(i, cancellationTokenSource.Token)));
             // сначала думал что тоже нужно вызывать ToList
             // но оказалось он работатет хитрее видимо внутри себя он уже вызывает подобный метод который проходит по всей коллекции
             // в этом можно убедиться если раскомментировать 20 строчку в HttpClientJsonPlaceHolder.cs если бы он использовал что то вроде этого
