@@ -1,12 +1,8 @@
 ﻿using Lesson3Project1.Models;
 using Lesson3Project1.Models.Dto;
 using Lesson3Project1.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Lesson3Project1.Controllers
 {
@@ -14,30 +10,24 @@ namespace Lesson3Project1.Controllers
     [ApiController]
     public class PersonsController : ControllerBase
     {
-        private readonly IRepository<Person> _repository;
+        private readonly IRepository<Person, BaseKey> _repository;
 
-        public PersonsController(IRepository<Person> repository)
+        public PersonsController(IRepository<Person, BaseKey> repository)
         {
             _repository = repository;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult Persons([FromRoute]int id)
-        {
-            Person person = _repository.GetAll().FirstOrDefault(p => p.Id == id);
-            
-            return person is null ? (IActionResult)NotFound() : Ok(person);
-        }
+        public IActionResult Persons([FromRoute]int id) =>
+            _repository.GetAll().FirstOrDefault(p => p.Id == id) is Person person ? 
+            Ok(person) : (IActionResult)NotFound();
 
         [HttpGet]
         [Route("search")]
-        public IActionResult Persons([FromQuery] string searchTerm)
-        {
-            Person person = _repository.GetAll().FirstOrDefault(p => p.FirstName == searchTerm);
-
-            return person is null ? (IActionResult)NotFound() : Ok(person);
-        }
+        public IActionResult Persons([FromQuery] string searchTerm) =>
+            _repository.GetAll().FirstOrDefault(p => p.FirstName == searchTerm) is Person person ? 
+            Ok(person) : (IActionResult)NotFound();
 
         [HttpGet]
         public IActionResult Persons(PersonPageNavDto personPageNav) =>
@@ -54,7 +44,7 @@ namespace Lesson3Project1.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult PersonsDelete([FromRoute] int id) =>
-            _repository.Delete(id) ? (IActionResult)Ok() : NotFound();
+        public IActionResult PersonsDelete([FromRoute] BaseKey key) =>
+            _repository.Delete(key) ? (IActionResult)Ok() : NotFound();
     }
 }

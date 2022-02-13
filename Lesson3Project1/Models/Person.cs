@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Lesson3Project1.Models
 {
-    public class Person
+    public class Person : BaseKey
     {
-        [Required]
-        public int Id { get; set; }
-
         [Required]
         public string FirstName { get; set; }
         

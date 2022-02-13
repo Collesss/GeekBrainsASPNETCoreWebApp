@@ -1,12 +1,10 @@
 ﻿using Lesson3Project1.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Lesson3Project1.Repositories
 {
-    public class Repository : IRepository<Person>
+    public class Repository : IRepository<Person, BaseKey>
     {
         private object _loker = new object();
         private List<Person> _persons = new List<Person>();
@@ -21,7 +19,7 @@ namespace Lesson3Project1.Repositories
             _persons.AddRange(initData);
         }
 
-        bool IRepository<Person>.Add(Person value)
+        bool IRepository<Person, BaseKey>.Add(Person value)
         {
             lock(_loker)
             {
@@ -37,11 +35,11 @@ namespace Lesson3Project1.Repositories
             }
         }
 
-        bool IRepository<Person>.Delete(int id)
+        bool IRepository<Person, BaseKey>.Delete(BaseKey key)
         {
             lock (_loker)
             {
-                Person person = _persons.FirstOrDefault(p => p.Id == id);
+                Person person = _persons.FirstOrDefault(p => p.Id == key.Id);
 
                 if (person != null)
                 {
@@ -53,7 +51,7 @@ namespace Lesson3Project1.Repositories
             }
         }
 
-        bool IRepository<Person>.Update(Person value)
+        bool IRepository<Person, BaseKey>.Update(Person value)
         {
             lock (_loker)
             {
@@ -73,7 +71,7 @@ namespace Lesson3Project1.Repositories
             }
         }
 
-        IEnumerable<Person> IRepository<Person>.GetAll() =>
-            _persons;
+        IQueryable<Person> IRepository<Person, BaseKey>.GetAll() =>
+            _persons.AsQueryable();
     }
 }

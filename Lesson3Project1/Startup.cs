@@ -28,7 +28,7 @@ namespace Lesson3Project1
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<IRepository<Person>>(new Repository(InitData.PersonsData));
+            services.AddSingleton<IRepository<Person, BaseKey>>(new Repository(InitData.PersonsData));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
