@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Timesheets.Models\Timesheets.Models.csproj" />
+    <ProjectReference Include="..\Timesheets.Storage\Timesheets.Storage.csproj" />
+  </ItemGroup>
+
+
+</Project>
