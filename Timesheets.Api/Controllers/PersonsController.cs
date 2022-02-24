@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Timesheets.Api.Models;
 using Timesheets.Models;
 using Timesheets.Storage.Repositories;
 
@@ -13,7 +12,7 @@ namespace Timesheets.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class PersonsController : ControllerBase
-    {
+    {/*
         private readonly IRepository<Person, BaseKey> _repository;
 
         public PersonsController(IRepository<Person, BaseKey> repository)
@@ -50,6 +49,6 @@ namespace Timesheets.Api.Controllers
         [Route("{id}")]
         public IActionResult PersonsDelete([FromRoute] BaseKey key) =>
             _repository.Delete(key) ? (IActionResult)Ok() : NotFound();
+        */
     }
-}
 }

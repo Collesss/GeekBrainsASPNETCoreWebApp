@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Timesheets.Storage.Repositories
 {
-    public interface IRepository<T, BaseKey> where T : BaseKey
+    public interface IRepository<T>
     {
         public IQueryable<T> GetAll();
-        public bool Add(T value);
-        public bool Update(T value);
-        public bool Delete(BaseKey key);
+        public Task Add(T value);
+        public Task Update(T value);
+        public Task Delete(T value);
     }
 }

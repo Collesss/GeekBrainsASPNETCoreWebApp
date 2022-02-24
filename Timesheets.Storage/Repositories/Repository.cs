@@ -1,80 +1,40 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Timesheets.Models;
 
 namespace Timesheets.Storage.Repositories
 {
-    public class Repository : IRepository<Person, BaseKey>
+    public class Repository<T> : IRepository<T> where T : class
     {
-        private object _loker = new object();
-        private List<Person> _persons = new List<Person>();
-
-        public Repository()
+        private readonly TimeSheetDbContext _context;
+        public Repository(TimeSheetDbContext context)
         {
-
+            _context = context;
         }
 
-        public Repository(IEnumerable<Person> initData)
+        IQueryable<T> IRepository<T>.GetAll() =>
+            _context.Set<T>().AsNoTracking();
+
+        async Task IRepository<T>.Add(T value)
         {
-            _persons.AddRange(initData);
+            await _context.AddAsync(value);
+            await _context.SaveChangesAsync();
         }
 
-        bool IRepository<Person, BaseKey>.Add(Person value)
+        async Task IRepository<T>.Delete(T value)
         {
-            lock (_loker)
-            {
-                Person person = _persons.FirstOrDefault(p => p.Id == value.Id);
-
-                if (person == null)
-                {
-                    _persons.Add(value);
-                    return true;
-                }
-
-                return false;
-            }
+            _context.Remove(value);
+            await _context.SaveChangesAsync();
         }
 
-        bool IRepository<Person, BaseKey>.Delete(BaseKey key)
+        async Task IRepository<T>.Update(T value)
         {
-            lock (_loker)
-            {
-                Person person = _persons.FirstOrDefault(p => p.Id == key.Id);
-
-                if (person != null)
-                {
-                    _persons.Remove(person);
-                    return true;
-                }
-
-                return false;
-            }
+            _context.Update(value);
+            await _context.SaveChangesAsync();
         }
-
-        bool IRepository<Person, BaseKey>.Update(Person value)
-        {
-            lock (_loker)
-            {
-                Person person = _persons.FirstOrDefault(p => p.Id == value.Id);
-
-                if (person != null)
-                {
-                    person.FirstName = value.FirstName;
-                    person.LastName = value.LastName;
-                    person.Email = value.Email;
-                    person.Company = value.Company;
-                    person.Age = value.Age;
-                    return true;
-                }
-
-                return false;
-            }
-        }
-
-        IQueryable<Person> IRepository<Person, BaseKey>.GetAll() =>
-            _persons.AsQueryable();
     }
-}
 }

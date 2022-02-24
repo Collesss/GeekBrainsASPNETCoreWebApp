@@ -1,16 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Timesheets.Models;
+using Timesheets.Storage;
 using Timesheets.Storage.Repositories;
 
 namespace Timesheets.Api
@@ -28,7 +23,10 @@ namespace Timesheets.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<IRepository<Person, BaseKey>>(new Repository(InitData.PersonsData));
+
+            services.AddDbContext<TimeSheetDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IRepository<User>, Repository<User>>();
+            services.AddScoped<IRepository<Employee>, Repository<Employee>>();
         }
 
 
