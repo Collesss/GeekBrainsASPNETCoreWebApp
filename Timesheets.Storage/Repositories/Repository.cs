@@ -19,22 +19,25 @@ namespace Timesheets.Storage.Repositories
         IQueryable<T> IRepository<T>.GetAll() =>
             _context.Set<T>().AsNoTracking();
 
-        async Task IRepository<T>.Add(T value)
+        async Task<T> IRepository<T>.Add(T value)
         {
-            await _context.AddAsync(value);
+            var entiry = await _context.AddAsync(value);
             await _context.SaveChangesAsync();
+            return entiry.Entity;
         }
 
-        async Task IRepository<T>.Delete(T value)
+        async Task<T> IRepository<T>.Delete(T value)
         {
-            _context.Remove(value);
+            var entiry = _context.Remove(value);
             await _context.SaveChangesAsync();
+            return entiry.Entity;
         }
 
-        async Task IRepository<T>.Update(T value)
+        async Task<T> IRepository<T>.Update(T value)
         {
-            _context.Update(value);
+            var entiry = _context.Update(value);
             await _context.SaveChangesAsync();
+            return entiry.Entity;
         }
     }
 }

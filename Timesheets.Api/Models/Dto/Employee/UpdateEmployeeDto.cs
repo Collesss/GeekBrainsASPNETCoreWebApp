@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Timesheets.Api.Models.Dto.Employee
 {
-    public class CreateEmployeeDto
+    public class UpdateEmployeeDto
     {
         [Required]
+        public int Id { get; set; }
         public string Department { get; set; }
-
-        [Required]
         public int UserId { get; set; }
     }
 }

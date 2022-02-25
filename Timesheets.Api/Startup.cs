@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using Timesheets.Api.AutoMapperProfiles;
 using Timesheets.Models;
 using Timesheets.Storage;
 using Timesheets.Storage.Repositories;
@@ -24,9 +26,34 @@ namespace Timesheets.Api
         {
             services.AddControllers();
 
+            services.AddAutoMapper(cfg => {
+                cfg.AddProfile<AutoMapperToUserProfile>();
+                cfg.AddProfile<AutoMapperToEmployeeProfile>();
+            });
+
             services.AddDbContext<TimeSheetDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IRepository<User>, Repository<User>>();
             services.AddScoped<IRepository<Employee>, Repository<Employee>>();
+
+            services.AddSwaggerGen(opts => 
+                opts.SwaggerDoc("v1", new OpenApiInfo 
+                {
+                    Version = "v1",
+                    Title = "API TimesSheets",
+                    Description = "API TimesSheets",
+                    /*TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Kadyrov",
+                        Email = string.Empty,
+                        Url = new Uri("https://kremlin.ru"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "можно указать под какой лицензией все опубликовано",
+                        Url = new Uri("https://example.com/license"),
+                    }*/
+                }));
         }
 
 
@@ -41,7 +68,9 @@ namespace Timesheets.Api
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseSwagger();
+
+            app.UseSwaggerUI(opts => opts.SwaggerEndpoint("/swagger/v1/swagger.json", "API TimesSheets"));
 
             app.UseEndpoints(endpoints =>
             {

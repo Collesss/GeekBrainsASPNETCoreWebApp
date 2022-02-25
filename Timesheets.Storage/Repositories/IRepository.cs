@@ -9,8 +9,8 @@ namespace Timesheets.Storage.Repositories
     public interface IRepository<T>
     {
         public IQueryable<T> GetAll();
-        public Task Add(T value);
-        public Task Update(T value);
-        public Task Delete(T value);
+        public Task<T> Add(T value);
+        public Task<T> Update(T value);
+        public Task<T> Delete(T value);
     }
 }

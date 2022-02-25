@@ -14,6 +14,8 @@ namespace Timesheets.Storage.ModelsConfigurations
             builder.HasKey(e => e.Id);
 
             builder.HasIndex(e => e.Department);
+            builder.Property(e => e.Department)
+                .IsRequired();
 
             builder.HasOne(e => e.User)
                 .WithOne()
