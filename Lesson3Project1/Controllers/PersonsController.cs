@@ -19,8 +19,8 @@ namespace Lesson3Project1.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult Persons([FromRoute]int id) =>
-            _repository.GetAll().FirstOrDefault(p => p.Id == id) is Person person ? 
+        public IActionResult Persons([FromRoute] int id) =>
+            _repository.GetByKey(new BaseKey { Id = id }) is Person person ? 
             Ok(person) : (IActionResult)NotFound();
 
         [HttpGet]
@@ -30,7 +30,7 @@ namespace Lesson3Project1.Controllers
             Ok(person) : (IActionResult)NotFound();
 
         [HttpGet]
-        public IActionResult Persons(PersonPageNavDto personPageNav) =>
+        public IActionResult Persons([FromQuery] PersonPageNavDto personPageNav) =>
             Ok(_repository.GetAll().Skip(personPageNav.Skip).Take(personPageNav.Take));
 
         [HttpPost]

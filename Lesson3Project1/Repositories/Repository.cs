@@ -71,7 +71,10 @@ namespace Lesson3Project1.Repositories
             }
         }
 
-        IQueryable<Person> IRepository<Person, BaseKey>.GetAll() =>
-            _persons.AsQueryable();
+        List<Person> IRepository<Person, BaseKey>.GetAll() =>
+            _persons;
+
+        Person IRepository<Person, BaseKey>.GetByKey(BaseKey baseKey) =>
+            _persons.FirstOrDefault(p => p.Id == baseKey.Id);
     }
 }
