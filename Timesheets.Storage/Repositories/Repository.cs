@@ -8,16 +8,16 @@ using Timesheets.Models;
 
 namespace Timesheets.Storage.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public abstract class Repository<T> : IRepository<T> where T : class
     {
-        private readonly TimeSheetDbContext _context;
+        protected readonly TimeSheetDbContext _context;
         public Repository(TimeSheetDbContext context)
         {
             _context = context;
         }
 
-        IQueryable<T> IRepository<T>.GetAll() =>
-            _context.Set<T>().AsNoTracking();
+        async Task<IEnumerable<T>> IRepository<T>.GetAll() =>
+            await _context.Set<T>().AsNoTracking().ToListAsync();
 
         async Task<T> IRepository<T>.Add(T value)
         {
@@ -39,5 +39,7 @@ namespace Timesheets.Storage.Repositories
             await _context.SaveChangesAsync();
             return entiry.Entity;
         }
+
+        public abstract Task<T> GetById(int Id);
     }
 }

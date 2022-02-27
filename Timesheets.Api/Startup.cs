@@ -32,8 +32,8 @@ namespace Timesheets.Api
             });
 
             services.AddDbContext<TimeSheetDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IRepository<User>, Repository<User>>();
-            services.AddScoped<IRepository<Employee>, Repository<Employee>>();
+            services.AddScoped<IRepository<User>, RepositoryUser>();
+            services.AddScoped<IRepository<Employee>, RepositoryEmployee>();
 
             services.AddSwaggerGen(opts => 
                 opts.SwaggerDoc("v1", new OpenApiInfo 

@@ -27,7 +27,7 @@ namespace Timesheets.Api.Controllers
 
         [HttpGet()]
         public async Task<IEnumerable<Entity>> Get() =>
-            await _repository.GetAll().ToListAsync();
+            await _repository.GetAll();
 
         [HttpPost]
         public async Task<Entity> Post([FromBody] CreateDto createEmployee) =>

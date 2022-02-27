@@ -4,13 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Timesheets.Api.Models.Dto.Employee
+namespace Timesheets.Api.Models.Dto.Employee.Request
 {
-    public class UpdateEmployeeDto
+    public class CreateEmployeeRequestDto
     {
         [Required]
-        public int Id { get; set; }
         public string Department { get; set; }
+
+        [Required]
         public int UserId { get; set; }
     }
 }

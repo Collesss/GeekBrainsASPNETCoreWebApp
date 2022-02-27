@@ -12,9 +12,9 @@ namespace Timesheets.Api.AutoMapperProfiles
     {
         public AutoMapperToUserProfile()
         {
-            CreateMap<CreateUserDto, User>();
-            CreateMap<UpdateUserDto, User>();
-            CreateMap<DeleteUserDto, User>();
+            CreateMap<CreateUserRequestDto, User>();
+            CreateMap<UpdateUserRequestDto, User>();
+            CreateMap<DeleteUserRequestDto, User>();
         }
     }
 }

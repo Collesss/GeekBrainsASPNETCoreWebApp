@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Timesheets.Api.Models.Dto.User
+namespace Timesheets.Api.Models.Dto.User.Request
 {
-    public class UpdateUserDto
+    public class UpdateUserRequestDto
     {
         [Required]
         public int Id { get; set; }
