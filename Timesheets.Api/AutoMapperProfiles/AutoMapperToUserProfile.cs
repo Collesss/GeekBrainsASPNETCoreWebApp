@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timesheets.Api.Models.Dto.User;
+using Timesheets.Api.Models.Dto.User.Request;
+using Timesheets.Api.Models.Dto.User.Response;
 using Timesheets.Models;
 
 namespace Timesheets.Api.AutoMapperProfiles
@@ -15,6 +17,8 @@ namespace Timesheets.Api.AutoMapperProfiles
             CreateMap<CreateUserRequestDto, User>();
             CreateMap<UpdateUserRequestDto, User>();
             CreateMap<DeleteUserRequestDto, User>();
+
+            CreateMap<User, ResponseUserDto>();
         }
     }
 }

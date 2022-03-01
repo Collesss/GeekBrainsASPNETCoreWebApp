@@ -10,35 +10,35 @@ using Timesheets.Storage.Repositories;
 
 namespace Timesheets.Api.Controllers
 {
-    public abstract class BaseCRUDController<Entity, CreateDto, UpdateDto, DeleteDto> : ControllerBase 
-        where Entity : class
-        where CreateDto : class
-        where UpdateDto : class
-        where DeleteDto : class
+    public abstract class BaseCRUDController<TEntity, RQCreateRequestDto, RQUpdateRequestDto, RQDeleteRequestDto, RSResponseDto> : ControllerBase 
+        where TEntity : class
+        where RQCreateRequestDto : class
+        where RQUpdateRequestDto : class
+        where RQDeleteRequestDto : class
     {
-        protected readonly IRepository<Entity> _repository;
+        protected readonly IRepository<TEntity> _repository;
         protected readonly IMapper _autoMapper;
 
-        protected BaseCRUDController(IRepository<Entity> repository, IMapper autoMapper)
+        protected BaseCRUDController(IRepository<TEntity> repository, IMapper autoMapper)
         {
             _repository = repository;
             _autoMapper = autoMapper;
         }
 
         [HttpGet()]
-        public async Task<IEnumerable<Entity>> Get() =>
-            await _repository.GetAll();
+        public async Task<IEnumerable<RSResponseDto>> Get() =>
+            _autoMapper.Map<RSResponseDto[]>(await _repository.GetAll());
 
         [HttpPost]
-        public async Task<Entity> Post([FromBody] CreateDto createEmployee) =>
-            await _repository.Add(_autoMapper.Map<Entity>(createEmployee));
+        public async Task<RSResponseDto> Post([FromBody] RQCreateRequestDto createEmployee) =>
+            _autoMapper.Map<RSResponseDto>(await _repository.Add(_autoMapper.Map<TEntity>(createEmployee)));
 
         [HttpPatch]
-        public async Task<Entity> Put([FromBody] UpdateDto updateEmployee) =>
-            await _repository.Update(_autoMapper.Map<Entity>(updateEmployee));
+        public async Task<RSResponseDto> Put([FromBody] RQUpdateRequestDto updateEmployee) =>
+            _autoMapper.Map<RSResponseDto>(await _repository.Update(_autoMapper.Map<TEntity>(updateEmployee)));
 
         [HttpDelete("{id}")]
-        public async Task<Entity> Delete(DeleteDto deleteEmployee) =>
-            await _repository.Delete(_autoMapper.Map<Entity>(deleteEmployee));
+        public async Task<RSResponseDto> Delete(RQDeleteRequestDto deleteEmployee) =>
+            _autoMapper.Map<RSResponseDto>(await _repository.Delete(_autoMapper.Map<TEntity>(deleteEmployee)));
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timesheets.Api.Models.Dto.Employee.Request;
+using Timesheets.Api.Models.Dto.Employee.Response;
 using Timesheets.Models;
 using Timesheets.Storage.Repositories;
 
@@ -12,7 +13,7 @@ namespace Timesheets.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : BaseCRUDController<Employee, CreateEmployeeRequestDto, UpdateEmployeeRequestDto, DeleteEmployeeRequestDto>
+    public class EmployeesController : BaseCRUDController<Employee, CreateEmployeeRequestDto, UpdateEmployeeRequestDto, DeleteEmployeeRequestDto, ResponseEmployeeDto>
     {
         public EmployeesController(IRepository<Employee> repository, IMapper autoMapper) : base(repository, autoMapper)
         {
@@ -20,7 +21,7 @@ namespace Timesheets.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<Employee> Get(int id) =>
-            (await _repository.GetAll()).FirstOrDefault(e => e.Id == id);
+        public async Task<ResponseEmployeeDto> Get(int id) =>
+            _autoMapper.Map<ResponseEmployeeDto>(await _repository.GetById(id));
     }
 }
