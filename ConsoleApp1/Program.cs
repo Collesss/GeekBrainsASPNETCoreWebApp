@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AuthenticateService;
+using System;
 
 namespace ConsoleApp1
 {
@@ -6,7 +7,9 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine(new UserServiceTest().GenerateJwtToken(0));
+            Console.WriteLine(new UserServiceTest().GenerateJwtToken(1));
+            Console.ReadKey();
         }
     }
 }
