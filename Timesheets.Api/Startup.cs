@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -29,11 +30,21 @@ namespace Timesheets.Api
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.RequireHttpsMetadata = false;
+                    
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-
+                        //IssuerSigningKey = new SecurityKey
+                        //IssuerSigningKey
                     };
                 });
+
+            services.AddAuthorization(opts => 
+            {
+                opts.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("token_type", "access")
+                    .Build();
+            });
 
             services.AddControllers();
 

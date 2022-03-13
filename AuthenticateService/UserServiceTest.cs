@@ -18,7 +18,6 @@ namespace AuthenticateService
 
             byte[] key = Encoding.ASCII.GetBytes(SecretCode);
 
-            //IOptions
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -31,7 +30,7 @@ namespace AuthenticateService
             };
 
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-
+            //tokenHandler
             return tokenHandler.WriteToken(token);
         }
     }
