@@ -10,5 +10,6 @@ namespace Timesheets.Tokens
         string GetToken(T dataForGen);
 
         Task<bool> CheckValidToken(string token);
+        bool TryCheckValidToken(string token, out T dataToken);
     }
 }

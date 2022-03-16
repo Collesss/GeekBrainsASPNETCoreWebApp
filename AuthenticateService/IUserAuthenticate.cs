@@ -14,6 +14,7 @@ namespace AuthenticateService
     public interface IUserAuthenticate
     {
         public PairTokens Authenticate(string username, string password);
-        public StatusAuthenticate TryAuthenticate(string username, string password, out PairTokens tokens);
+        //public StatusAuthenticate TryAuthenticate(string username, string password, out PairTokens tokens);
+        public PairTokens GetNewPairToken(string refreshToken);
     }
 }

@@ -11,7 +11,7 @@ namespace Timesheets.Tokens
 {
     public class TokenGeneratorWithBaseData<TBaseData, VDataForGen> : ITokenGenerator<VDataForGen>
         where TBaseData : BaseDataForGenToken
-        where VDataForGen : DataForGenToken
+        where VDataForGen : DataForGenToken, new()
     {
         private readonly TBaseData _baseData;
 
@@ -40,11 +40,8 @@ namespace Timesheets.Tokens
             return tokenHandler.WriteToken(token);
         }
 
-        async Task<bool> ITokenGenerator<VDataForGen>.CheckValidToken(string token) 
-        {
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            var ValidResult = await tokenHandler.ValidateTokenAsync(token, new TokenValidationParameters
+        private async Task<TokenValidationResult> GetTokenValidResult(string token) =>
+            await new JwtSecurityTokenHandler().ValidateTokenAsync(token, new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidIssuer = _baseData.Issuer,
@@ -55,7 +52,30 @@ namespace Timesheets.Tokens
                 ValidateLifetime = true
             });
 
-            return ValidResult.IsValid && ValidResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType);
+        async Task<bool> ITokenGenerator<VDataForGen>.CheckValidToken(string token) 
+        {
+            TokenValidationResult validationResult = await GetTokenValidResult(token);
+
+            return validationResult.IsValid && validationResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType);
+        }
+
+        bool ITokenGenerator<VDataForGen>.TryCheckValidToken(string token, out VDataForGen dataToken)
+        {
+            TokenValidationResult validationResult = GetTokenValidResult(token).Result;
+
+            if(validationResult.IsValid && validationResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType))
+            {
+                dataToken = new VDataForGen 
+                { 
+                    UserName = validationResult.ClaimsIdentity.FindFirst(ClaimTypes.Name).Value
+                };
+
+                return true;
+            }
+
+            dataToken = null;
+
+            return false;
         }
     }
 }

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Timesheets.Storage\Timesheets.Storage.csproj" />
+    <ProjectReference Include="..\Timesheets.Tokens\Timesheets.Tokens.csproj" />
   </ItemGroup>
 
 </Project>
