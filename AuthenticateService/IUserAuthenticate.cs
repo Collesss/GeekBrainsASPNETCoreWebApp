@@ -4,13 +4,14 @@ using System.Text;
 
 namespace AuthenticateService
 {
+    /*`
     public enum StatusAuthenticate
     {
         OK = 1,
         UserNotFound,
         PasswordIncorrect,
     }
-
+    */
     public interface IUserAuthenticate
     {
         public PairTokens Authenticate(string username, string password);

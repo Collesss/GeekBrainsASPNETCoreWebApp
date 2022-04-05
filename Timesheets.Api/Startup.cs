@@ -1,3 +1,4 @@
+using AuthenticateService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -9,9 +10,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Timesheets.Api.AutoMapperProfiles;
+using Timesheets.Api.Models;
 using Timesheets.Models;
 using Timesheets.Storage;
 using Timesheets.Storage.Repositories;
+using Timesheets.Tokens;
+using Timesheets.Tokens.Models;
 
 namespace Timesheets.Api
 {
@@ -27,6 +31,10 @@ namespace Timesheets.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            OptionsForGenToken optionsForGenToken = Configuration.GetSection("DataToken").Get<OptionsForGenToken>();
+
+            //services.PostConfigure<BaseDataForGenAccessToken>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.RequireHttpsMetadata = false;
@@ -56,6 +64,14 @@ namespace Timesheets.Api
             services.AddDbContext<TimeSheetDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IRepository<User>, RepositoryUser>();
             services.AddScoped<IRepository<Employee>, RepositoryEmployee>();
+
+            services.AddScoped<IUserAuthenticate, UserAuthenticate>();
+
+            services.AddSingleton<ITokenGenerator<DataForGenAccessToken, CommonDataTokenWithExpire<DataForGenAccessToken>>,
+                TokenGeneratorWithBaseData<BaseDataForGenAccessToken, DataForGenAccessToken>>();
+
+            services.AddSingleton<ITokenGenerator<DataForGenRefreshToken, CommonDataTokenWithExpire<DataForGenRefreshToken>>,
+                TokenGeneratorWithBaseData<BaseDataForGetRefreshToken, DataForGenRefreshToken>>();
 
             services.AddSwaggerGen(opts => 
                 opts.SwaggerDoc("v1", new OpenApiInfo 

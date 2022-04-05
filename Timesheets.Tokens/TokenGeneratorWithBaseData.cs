@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,18 +10,18 @@ using Timesheets.Tokens.Models;
 
 namespace Timesheets.Tokens
 {
-    public class TokenGeneratorWithBaseData<TBaseData, VDataForGen> : ITokenGenerator<VDataForGen>
+    public class TokenGeneratorWithBaseData<TBaseData, VDataForGen> : ITokenGenerator<VDataForGen, CommonDataTokenWithExpire<VDataForGen>>
         where TBaseData : BaseDataForGenToken
         where VDataForGen : DataForGenToken, new()
     {
         private readonly TBaseData _baseData;
 
-        public TokenGeneratorWithBaseData(TBaseData baseData)
+        public TokenGeneratorWithBaseData(IOptions<TBaseData> baseData)
         {
-            _baseData = baseData;
+            _baseData = baseData.Value;
         }
 
-        string ITokenGenerator<VDataForGen>.GetToken(VDataForGen dataForGen)
+        string ITokenGenerator<VDataForGen, CommonDataTokenWithExpire<VDataForGen>>.GetToken(VDataForGen dataForGen)
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
@@ -52,22 +53,28 @@ namespace Timesheets.Tokens
                 ValidateLifetime = true
             });
 
-        async Task<bool> ITokenGenerator<VDataForGen>.CheckValidToken(string token) 
+        async Task<bool> ITokenGenerator<VDataForGen, CommonDataTokenWithExpire<VDataForGen>>.CheckValidToken(string token) 
         {
             TokenValidationResult validationResult = await GetTokenValidResult(token);
 
             return validationResult.IsValid && validationResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType);
         }
 
-        bool ITokenGenerator<VDataForGen>.TryCheckValidToken(string token, out VDataForGen dataToken)
+        bool ITokenGenerator<VDataForGen, CommonDataTokenWithExpire<VDataForGen>>.TryCheckValidToken(string token, out CommonDataTokenWithExpire<VDataForGen> dataToken)
         {
             TokenValidationResult validationResult = GetTokenValidResult(token).Result;
 
             if(validationResult.IsValid && validationResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType))
             {
-                dataToken = new VDataForGen 
+                dataToken = new CommonDataTokenWithExpire<VDataForGen>
                 { 
-                    UserName = validationResult.ClaimsIdentity.FindFirst(ClaimTypes.Name).Value
+                    ValidFrom = validationResult.SecurityToken.ValidFrom,
+                    ValidTo = validationResult.SecurityToken.ValidTo,
+
+                    DataForGen = new VDataForGen
+                    {
+                        UserName = validationResult.ClaimsIdentity.FindFirst(ClaimTypes.Name).Value
+                    }
                 };
 
                 return true;

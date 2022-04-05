@@ -13,12 +13,12 @@ namespace AuthenticateService
     public class UserAuthenticate : IUserAuthenticate
     {
         private readonly IUserRepository _repositoryUsers;
-        private readonly ITokenGenerator<DataForGenAccessToken> _tokenGeneratorAccess;
-        private readonly ITokenGenerator<DataForGenRefreshToken> _tokenGeneratorRefresh;
+        private readonly ITokenGenerator<DataForGenAccessToken, CommonDataTokenWithExpire<DataForGenAccessToken>> _tokenGeneratorAccess;
+        private readonly ITokenGenerator<DataForGenRefreshToken, CommonDataTokenWithExpire<DataForGenRefreshToken>> _tokenGeneratorRefresh;
 
         public UserAuthenticate(IUserRepository repositoryUsers, 
-                                ITokenGenerator<DataForGenAccessToken> tokenGeneratorAccess, 
-                                ITokenGenerator<DataForGenRefreshToken> tokenGeneratorRefresh)
+                                ITokenGenerator<DataForGenAccessToken, CommonDataTokenWithExpire<DataForGenAccessToken>> tokenGeneratorAccess, 
+                                ITokenGenerator<DataForGenRefreshToken, CommonDataTokenWithExpire<DataForGenRefreshToken>> tokenGeneratorRefresh)
         {
             _repositoryUsers = repositoryUsers;
             _tokenGeneratorAccess = tokenGeneratorAccess;
@@ -34,15 +34,11 @@ namespace AuthenticateService
         private bool CheckPasswordHash(string password, byte[] hash) =>
             SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(password)).SequenceEqual(hash);
 
-        PairTokens IUserAuthenticate.GetNewPairToken(string refreshToken)
-        {
-            if(_tokenGeneratorRefresh.TryCheckValidToken(refreshToken, out DataForGenRefreshToken dataToken))
-            {
-
-            }
-
-            return null;
-        }
+        PairTokens IUserAuthenticate.GetNewPairToken(string refreshToken) =>
+                _tokenGeneratorRefresh.TryCheckValidToken(refreshToken, out CommonDataTokenWithExpire<DataForGenRefreshToken> dataToken) ?
+                new PairTokens(_tokenGeneratorAccess.GetToken(new DataForGenAccessToken { UserName = dataToken.DataForGen.UserName }),
+                               _tokenGeneratorRefresh.GetToken(new DataForGenRefreshToken { UserName = dataToken.DataForGen.UserName })) :
+                null;
 
         /*
         StatusAuthenticate IUserAuthenticate.TryAuthenticate(string username, string password, out PairTokens tokens)

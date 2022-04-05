@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AuthenticateService\AuthenticateService.csproj" />
     <ProjectReference Include="..\Timesheets.Models\Timesheets.Models.csproj" />
     <ProjectReference Include="..\Timesheets.Storage\Timesheets.Storage.csproj" />
   </ItemGroup>
