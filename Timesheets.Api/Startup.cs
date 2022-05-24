@@ -7,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Text;
 using Timesheets.Api.AutoMapperProfiles;
 using Timesheets.Api.Models;
 using Timesheets.Models;
@@ -33,7 +36,26 @@ namespace Timesheets.Api
         {
             OptionsForGenToken optionsForGenToken = Configuration.GetSection("DataToken").Get<OptionsForGenToken>();
 
-            //services.PostConfigure<BaseDataForGenAccessToken>();
+            SecurityKey key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(optionsForGenToken.Key));
+
+            services.AddSingleton<IOptions<BaseDataForGenAccessToken>>(
+                Options.Create(
+                    new BaseDataForGenAccessToken(
+                        optionsForGenToken.Issuer, 
+                        optionsForGenToken.Audience, 
+                        TimeSpan.FromSeconds(optionsForGenToken.LifeTimeSecond),
+                        key)));
+
+
+            services.AddSingleton<IOptions<BaseDataForGetRefreshToken>>(
+                Options.Create(
+                    new BaseDataForGetRefreshToken(
+                        optionsForGenToken.Issuer,
+                        optionsForGenToken.Audience,
+                        TimeSpan.FromSeconds(optionsForGenToken.LifeTimeSecond * 20),
+                        key)));
+
+
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
@@ -41,8 +63,13 @@ namespace Timesheets.Api
                     
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        //IssuerSigningKey = new SecurityKey
-                        //IssuerSigningKey
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = key,
+                        ValidateIssuer = true,
+                        ValidIssuer = optionsForGenToken.Issuer,
+                        ValidateAudience = true,
+                        ValidAudience = optionsForGenToken.Audience,
+                        ValidateLifetime = true
                     };
                 });
 
