@@ -32,6 +32,9 @@ namespace Timesheets.Storage.ModelsConfigurations
             builder.Property(u => u.Email)
                 .IsRequired()
                 .HasMaxLength(75);
+
+            builder.Property(u => u.PasswordHash)
+                .IsRequired();
         }
     }
 }

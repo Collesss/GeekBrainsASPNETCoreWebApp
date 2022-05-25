@@ -23,5 +23,15 @@ namespace Timesheets.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ResponseUserDto> Get(int id) =>
             _autoMapper.Map<ResponseUserDto>(await _repository.GetById(id));
+        
+        /*
+        public override async Task<ResponseUserDto> Post([FromBody] CreateUserRequestDto createEmployee)
+        {
+            _autoMapper.Map<User>(createEmployee)
+
+
+            return await base.Post(createEmployee);
+        }
+        */
     }
 }

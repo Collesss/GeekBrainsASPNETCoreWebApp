@@ -12,6 +12,9 @@ namespace Timesheets.Api.Models.Dto.User.Request
         public string Username { get; set; }
 
         [Required]
+        public string Password { get; set; }
+
+        [Required]
         public string FirstName { get; set; }
 
         [Required]

@@ -41,8 +41,8 @@ namespace Timesheets.Api
             services.AddSingleton<IOptions<BaseDataForGenAccessToken>>(
                 Options.Create(
                     new BaseDataForGenAccessToken(
-                        optionsForGenToken.Issuer, 
-                        optionsForGenToken.Audience, 
+                        optionsForGenToken.Issuer,
+                        optionsForGenToken.Audience,
                         TimeSpan.FromSeconds(optionsForGenToken.LifeTimeSecond),
                         key)));
 
@@ -56,32 +56,39 @@ namespace Timesheets.Api
                         key)));
 
 
+            services.AddControllers();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(opts => {
+                opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options => {
                     options.RequireHttpsMetadata = false;
-                    
+                    options.SaveToken = true;
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = key,
-                        ValidateIssuer = true,
-                        ValidIssuer = optionsForGenToken.Issuer,
-                        ValidateAudience = true,
-                        ValidAudience = optionsForGenToken.Audience,
-                        ValidateLifetime = true
+                        ValidateIssuer = false,
+                        //ValidIssuer = optionsForGenToken.Issuer,
+                        ValidateAudience = false,
+                        //ValidAudience = optionsForGenToken.Audience,
+                        //ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
 
-            services.AddAuthorization(opts => 
+            
+            /*
+            services.AddAuthorization(opts =>
             {
                 opts.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
                     .RequireClaim("token_type", "access")
                     .Build();
             });
-
-            services.AddControllers();
+            */
 
             services.AddAutoMapper(cfg => {
                 cfg.AddProfile<AutoMapperToUserProfile>();
@@ -90,6 +97,7 @@ namespace Timesheets.Api
 
             services.AddDbContext<TimeSheetDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IRepository<User>, RepositoryUser>();
+            services.AddScoped<IUserRepository, RepositoryUser>();
             services.AddScoped<IRepository<Employee>, RepositoryEmployee>();
 
             services.AddScoped<IUserAuthenticate, UserAuthenticate>();
@@ -100,8 +108,8 @@ namespace Timesheets.Api
             services.AddSingleton<ITokenGenerator<DataForGenRefreshToken, CommonDataTokenWithExpire<DataForGenRefreshToken>>,
                 TokenGeneratorWithBaseData<BaseDataForGetRefreshToken, DataForGenRefreshToken>>();
 
-            services.AddSwaggerGen(opts => 
-                opts.SwaggerDoc("v1", new OpenApiInfo 
+            services.AddSwaggerGen(opts => {
+                opts.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
                     Title = "API TimesSheets",
@@ -118,7 +126,30 @@ namespace Timesheets.Api
                         Name = "можно указать под какой лицензией все опубликовано",
                         Url = new Uri("https://example.com/license"),
                     }*/
-                }));
+                });
+
+                opts.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
+                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 1234abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                opts.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
         }
 
 
@@ -127,15 +158,19 @@ namespace Timesheets.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
+                app.UseSwagger();
+
+                app.UseSwaggerUI(opts => opts.SwaggerEndpoint("/swagger/v1/swagger.json", "API TimesSheets"));
+
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(opts => opts.SwaggerEndpoint("/swagger/v1/swagger.json", "API TimesSheets"));
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
