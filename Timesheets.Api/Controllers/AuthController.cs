@@ -29,16 +29,24 @@ namespace Timesheets.Api.Controllers
             if (resultAuth is null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
-            return Ok(resultAuth);
+            HttpContext.Response.Cookies.Append("refresh_token", resultAuth.RefreshToken);
+
+            return Ok(resultAuth.AccessToken);
         }
 
 
         [AllowAnonymous]
         [HttpPost("[action]")]
-        public IActionResult RefreshTokens(string refreshToken)
+        public IActionResult RefreshTokens()
         {
+            string refreshToken = HttpContext.Request.Cookies["refresh_token"];
 
-            return BadRequest();
+            var resultAuth = _userAuthenticate.GetNewPairToken(refreshToken);
+
+            if (resultAuth is null)
+                return BadRequest(new { message = "refresh_token is incorrect" });
+
+            return Ok(resultAuth.AccessToken);
         }
     }
 }

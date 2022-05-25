@@ -30,8 +30,11 @@ namespace Timesheets.Tokens
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, dataForGen.UserName),
-                    new Claim("TokenType", _baseData.TokenType)
+                    //new Claim("TokenType", _baseData.TokenType)
                 }),
+                TokenType = _baseData.TokenType,
+                Audience = _baseData.Audience,
+                Issuer = _baseData.Issuer,
                 Expires = DateTime.UtcNow.Add(_baseData.LifeTime),
                 SigningCredentials = new SigningCredentials(_baseData.SingingKey, SecurityAlgorithms.HmacSha256Signature)
             };
@@ -50,24 +53,26 @@ namespace Timesheets.Tokens
                 ValidAudience = _baseData.Audience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = _baseData.SingingKey,
-                ValidateLifetime = true
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                ValidTypes = new string[] { _baseData.TokenType }
             });
 
         async Task<bool> ITokenGenerator<VDataForGen, CommonDataTokenWithExpire<VDataForGen>>.CheckValidToken(string token) 
         {
             TokenValidationResult validationResult = await GetTokenValidResult(token);
 
-            return validationResult.IsValid && validationResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType);
+            return validationResult.IsValid;
         }
 
         bool ITokenGenerator<VDataForGen, CommonDataTokenWithExpire<VDataForGen>>.TryCheckValidToken(string token, out CommonDataTokenWithExpire<VDataForGen> dataToken)
         {
             TokenValidationResult validationResult = GetTokenValidResult(token).Result;
 
-            if(validationResult.IsValid && validationResult.ClaimsIdentity.HasClaim("TokenType", _baseData.TokenType))
+            if(validationResult.IsValid)
             {
                 dataToken = new CommonDataTokenWithExpire<VDataForGen>
-                { 
+                {
                     ValidFrom = validationResult.SecurityToken.ValidFrom,
                     ValidTo = validationResult.SecurityToken.ValidTo,
 

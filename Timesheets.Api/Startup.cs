@@ -64,28 +64,28 @@ namespace Timesheets.Api
             })
                 .AddJwtBearer(options => {
                     options.RequireHttpsMetadata = false;
-                    options.SaveToken = true;
+                    //options.SaveToken = true;
 
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = key,
-                        ValidateIssuer = false,
-                        //ValidIssuer = optionsForGenToken.Issuer,
-                        ValidateAudience = false,
-                        //ValidAudience = optionsForGenToken.Audience,
-                        //ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
+                        ValidateIssuer = true,
+                        ValidIssuer = optionsForGenToken.Issuer,
+                        ValidateAudience = true,
+                        ValidAudience = optionsForGenToken.Audience,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero,
+                        ValidTypes = new string [] { "Access" }
                     };
                 });
 
-            
             /*
             services.AddAuthorization(opts =>
             {
                 opts.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
-                    .RequireClaim("token_type", "access")
+                    .RequireClaim("TokenType", "Access")
                     .Build();
             });
             */
