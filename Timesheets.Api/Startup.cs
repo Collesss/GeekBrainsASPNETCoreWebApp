@@ -52,7 +52,7 @@ namespace Timesheets.Api
                     new BaseDataForGetRefreshToken(
                         optionsForGenToken.Issuer,
                         optionsForGenToken.Audience,
-                        TimeSpan.FromSeconds(optionsForGenToken.LifeTimeSecond * 20),
+                        TimeSpan.FromSeconds(optionsForGenToken.LifeTimeSecond + 15),
                         key)));
 
 
