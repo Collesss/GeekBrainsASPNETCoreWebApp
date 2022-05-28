@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AuthenticateService
 {
@@ -14,8 +15,8 @@ namespace AuthenticateService
     */
     public interface IUserAuthenticate
     {
-        public PairTokens Authenticate(string username, string password);
+        public Task<PairTokens> Authenticate(string username, string password);
         //public StatusAuthenticate TryAuthenticate(string username, string password, out PairTokens tokens);
-        public PairTokens GetNewPairToken(string refreshToken);
+        public Task<PairTokens> GetNewPairToken(string refreshToken);
     }
 }

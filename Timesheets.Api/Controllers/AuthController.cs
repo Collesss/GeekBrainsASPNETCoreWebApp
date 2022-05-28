@@ -22,9 +22,9 @@ namespace Timesheets.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("[action]")]
-        public IActionResult Authenticate([FromQuery] string user, string password)
+        public async Task<IActionResult> Authenticate([FromQuery] string user, string password)
         {
-            var resultAuth = _userAuthenticate.Authenticate(user, password);
+            var resultAuth = await _userAuthenticate.Authenticate(user, password);
 
             if (resultAuth is null)
                 return BadRequest(new { message = "Username or password is incorrect" });
@@ -37,11 +37,11 @@ namespace Timesheets.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("[action]")]
-        public IActionResult RefreshTokens()
+        public async Task<IActionResult> RefreshTokens()
         {
             string refreshToken = HttpContext.Request.Cookies["refresh_token"];
 
-            var resultAuth = _userAuthenticate.GetNewPairToken(refreshToken);
+            var resultAuth = await _userAuthenticate.GetNewPairToken(refreshToken);
 
             if (resultAuth is null)
                 return BadRequest(new { message = "refresh_token is incorrect" });
