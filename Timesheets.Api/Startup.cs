@@ -76,7 +76,7 @@ namespace Timesheets.Api
                         ValidAudience = optionsForGenToken.Audience,
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero,
-                        ValidTypes = new string [] { "Access" }
+                        ValidTypes = new string[] { "Access" }
                     };
                 });
 
@@ -95,10 +95,13 @@ namespace Timesheets.Api
                 cfg.AddProfile<AutoMapperToEmployeeProfile>();
             });
 
-            services.AddDbContext<TimeSheetDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<TimeSheetDbContext>(opts => {
+                opts.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")); 
+            });
             services.AddScoped<IRepository<User>, RepositoryUser>();
             services.AddScoped<IUserRepository, RepositoryUser>();
-            services.AddScoped<IRepository<Employee>, RepositoryEmployee>();
+            services.AddScoped<IEmployeeRepository, RepositoryEmployee>();
 
             services.AddScoped<IUserAuthenticate, UserAuthenticate>();
 

@@ -17,7 +17,7 @@ namespace Timesheets.Storage.Repositories
         }
 
         async Task<IEnumerable<T>> IRepository<T>.GetAll() =>
-            await _context.Set<T>().AsNoTracking().ToListAsync();
+            await _context.Set<T>().ToListAsync();
 
         async Task<T> IRepository<T>.Add(T value)
         {
